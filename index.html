@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poslovne Prilike za Poduzetnicu (malu seku) u Zagrebu</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: '#9333EA', // Purple 600
+                        secondary: '#10B981', // Emerald 500
+                        dark: '#111827', // Gray 900
+                        danger: '#EF4444' // Red 500
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c7c7cc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+        
+        /* Smooth Details/Summary transition */
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] summary ~ * { animation: sweep .3s ease-in-out; }
+        @keyframes sweep {
+            0%    {opacity: 0; margin-top: -10px}
+            100%  {opacity: 1; margin-top: 0px}
+        }
+
+        /* Tab hiding logic */
+        .tab-content { display: none; animation: fadeIn 0.4s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased overflow-x-hidden">
+
+    <!-- Desktop Sidebar (Hidden on mobile) -->
+    <aside class="hidden md:flex flex-col w-64 h-screen fixed top-0 left-0 bg-white border-r border-gray-200 shadow-sm z-20">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-dark leading-tight">Zagreb<span class="text-primary">2026</span></h1>
+            <p class="text-xs text-gray-500 mt-1">Poslovne prilike za poduzetnice</p>
+        </div>
+        <nav class="flex-1 px-4 space-y-2 mt-4">
+            <button onclick="switchTab('summary')" id="btn-summary" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 bg-primary text-white shadow-lg shadow-primary/40 hover:-translate-y-0.5">
+                <i class="fa-solid fa-chart-pie w-5"></i> Sažetak
+            </button>
+            <button onclick="switchTab('top-ideas')" id="btn-top-ideas" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-purple-50 hover:text-primary transition-all duration-300 hover:shadow-sm">
+                <i class="fa-solid fa-lightbulb w-5"></i> Top Prilike
+            </button>
+            <button onclick="switchTab('other-ideas')" id="btn-other-ideas" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-purple-50 hover:text-primary transition-all duration-300 hover:shadow-sm">
+                <i class="fa-solid fa-list-ul w-5"></i> Ostale Ideje
+            </button>
+            <button onclick="switchTab('avoid')" id="btn-avoid" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-purple-50 hover:text-primary transition-all duration-300 hover:shadow-sm">
+                <i class="fa-solid fa-triangle-exclamation w-5"></i> Što Izbjegavati
+            </button>
+        </nav>
+        <div class="p-4 border-t border-gray-100">
+            <div class="bg-purple-50 text-purple-800 text-xs p-3 rounded-xl flex items-start gap-2 shadow-inner border border-purple-100/50">
+                <i class="fa-solid fa-gem mt-0.5 text-primary"></i>
+                <p>Ekskluzivna strategija za solo osnivačice.</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Bottom Navigation (Hidden on desktop) -->
+    <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 z-50 flex justify-around items-center pb-safe pt-2 px-2 shadow-[0_-5px_15px_-10px_rgba(0,0,0,0.1)]">
+        <button onclick="switchTab('summary')" id="mbtn-summary" class="mobile-nav-btn flex flex-col items-center p-2 text-primary">
+            <i class="fa-solid fa-chart-pie text-lg mb-1"></i>
+            <span class="text-[10px] font-semibold">Sažetak</span>
+        </button>
+        <button onclick="switchTab('top-ideas')" id="mbtn-top-ideas" class="mobile-nav-btn flex flex-col items-center p-2 text-gray-400">
+            <i class="fa-solid fa-lightbulb text-lg mb-1"></i>
+            <span class="text-[10px] font-semibold">Top Ideje</span>
+        </button>
+        <button onclick="switchTab('other-ideas')" id="mbtn-other-ideas" class="mobile-nav-btn flex flex-col items-center p-2 text-gray-400">
+            <i class="fa-solid fa-list-ul text-lg mb-1"></i>
+            <span class="text-[10px] font-semibold">Ostalo</span>
+        </button>
+        <button onclick="switchTab('avoid')" id="mbtn-avoid" class="mobile-nav-btn flex flex-col items-center p-2 text-gray-400">
+            <i class="fa-solid fa-triangle-exclamation text-lg mb-1"></i>
+            <span class="text-[10px] font-semibold">Izbjegavati</span>
+        </button>
+    </nav>
+
+    <main class="md:ml-64 p-4 md:p-8 pb-24 md:pb-8 min-h-screen">
+        
+        <!-- =================== TAB 1: SAŽETAK =================== -->
+        <section id="summary" class="tab-content active max-w-4xl mx-auto">
+            <div class="mb-8">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-dark mb-4 tracking-tight">Poslovne Prilike za Poduzetnice u Zagrebu</h2>
+                <p class="text-gray-600 text-lg leading-relaxed">Sveobuhvatna analiza mikro-biznis prilika za solo osnivačicu u Zagrebu 2026. godine, fokusirana na premium usluge, neovisnost i profitabilnost.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Macro Context -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-4 text-xl shadow-sm">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Tržišni Kontekst & Makroekonomija</h3>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-check text-secondary mt-1"></i> <b>Ciljana demografija:</b> Rastuća srednja/viša klasa, IT stručnjaci, expati, dijaspora.</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-check text-secondary mt-1"></i> <b>Problem:</b> Klijenti su "vremenski siromašni", a financijski snažni (spremni platiti "porez na udobnost").</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-check text-secondary mt-1"></i> <b>Status ponude:</b> Trenutno tržište usluga u RH je fragmentirano, često u sivoj zoni i tehnološki zaostalo.</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-check text-secondary mt-1"></i> <b>Prednost:</b> Zapadnoeuropska razina profesionalizma i integracija jednostavne tehnologije (Dali) stvara asimetričnu prednost.</li>
+                    </ul>
+                </div>
+
+                <!-- Financials -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-4 text-xl shadow-sm">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Financijski Okvir (Paušalni Obrt)</h3>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-arrow-right text-purple-500 mt-1"></i> <b>Fiksni troškovi:</b> Mjesečni doprinosi cca 291 EUR (119€ mirovinsko, 131€ zdravstveno).</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-arrow-right text-purple-500 mt-1"></i> <b>Minimalna marža:</b> Posao mora generirati min. 500-600 EUR bruto marže mjesečno samo za preživljavanje.</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-arrow-right text-purple-500 mt-1"></i> <b>Limit PDV-a:</b> Prag za ulazak u PDV je 60.000 EUR (od 2025/2026).</li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-arrow-right text-purple-500 mt-1"></i> <b>Zaključak:</b> Izbjegavati niske marže i mikro-transakcije. Fokus na premium usluge s visokom dodanom vrijednošću.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Validation Protocol -->
+            <div class="bg-gradient-to-br from-primary to-purple-900 rounded-3xl p-6 md:p-8 text-white shadow-xl shadow-purple-900/20 mb-8">
+                <h3 class="text-2xl font-bold mb-4 flex items-center gap-3">
+                    <i class="fa-solid fa-flask text-yellow-400"></i> Plan Validacije (Prije Investiranja)
+                </h3>
+                <p class="text-gray-300 mb-6 text-sm md:text-base">Zlatno pravilo iz svih izvješća: Ne otvarati obrt prije potvrde tržišta. Provesti test od 30 dana s budžetom ispod 100 EUR.</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/20">
+                        <div class="text-yellow-400 font-bold mb-1">Tjedan 1</div>
+                        <h4 class="font-semibold text-sm mb-2">Intervjui s kupcima</h4>
+                        <p class="text-xs text-gray-300">10-25 strukturiranih intervjua s HR menadžerima, majkama, expatima. Cilj: detektirati bolnu točku.</p>
+                    </div>
+                    <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/20">
+                        <div class="text-yellow-400 font-bold mb-1">Tjedan 2</div>
+                        <h4 class="font-semibold text-sm mb-2">Fake-Door Landing</h4>
+                        <p class="text-xs text-gray-300">Izrada Carrd/Webflow stranice uz pomoć Dalija. Ponuda izgleda operativno s formom za upit (Lead capture).</p>
+                    </div>
+                    <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/20">
+                        <div class="text-yellow-400 font-bold mb-1">Tjedan 3</div>
+                        <h4 class="font-semibold text-sm mb-2">Marketinški Test</h4>
+                        <p class="text-xs text-gray-300">Targetirana lokalna Google/Meta Ads kampanja (50-100 EUR). Mjerenje konverzija (prag: min 3%).</p>
+                    </div>
+                    <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/20">
+                        <div class="text-yellow-400 font-bold mb-1">Tjedan 4</div>
+                        <h4 class="font-semibold text-sm mb-2">Avans & Depozit</h4>
+                        <p class="text-xs text-gray-300">Naplata prvog audita ili prikupljanje pre-order depozita. GO signal: 3-5 uplaćenih klijenata.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Uloga Tehnologije -->
+            <div class="bg-purple-50 border border-purple-100 rounded-3xl p-6 flex flex-col md:flex-row gap-6 items-center shadow-sm">
+                <div class="w-16 h-16 bg-primary text-white rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-lg shadow-purple-500/30 rotate-3">
+                    <i class="fa-solid fa-code-branch -rotate-3"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-purple-900 mb-2">Uloga Tehnološkog Partnera (Dali)</h3>
+                    <p class="text-sm text-purple-800 leading-relaxed">
+                        Softver ne smije biti proizvod (izbjegavati vlastite aplikacije i marketplaceove). Tehnologija služi kao <b>operativna poluga</b>. Dali postavlja <i>No-Code</i> automatizacije: klijentske portale (Softr/Airtable), automatizirane PDF ponude, kalendare rezervacija (Calendly), Stripe pretplate i WhatsApp obavijesti. To osnivačici daje imidž velike tvrtke i oslobađa vrijeme za terenski rad.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== TAB 2: TOP PRILIKE =================== -->
+        <section id="top-ideas" class="tab-content max-w-4xl mx-auto">
+            <div class="mb-8">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-dark mb-4 tracking-tight">Top Prilike (Preporuke)</h2>
+                <p class="text-gray-600 text-lg">Konsolidirani popis najboljih poslovnih modela iz sva tri izvješća. Fokus je na visokoj margini, ne-medicinskom pristupu i operativnoj jednostavnosti.</p>
+            </div>
+
+            <div class="space-y-4">
+                
+                <!-- Idea 1 -->
+                <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer">
+                    <summary class="flex justify-between items-center font-bold p-5 md:p-6 text-gray-900 bg-white hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid fa-hand-holding-heart"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg md:text-xl">1. Premium Concierge za Seniore</h3>
+                                <p class="text-sm text-gray-500 font-normal mt-0.5">Ne-medicinska logistika, digitalna podrška i obiteljski izvještaji.</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-5 md:p-6 border-t border-gray-100 bg-gray-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Koncept & Tržište</h4>
+                                <p class="text-sm text-gray-600 mb-3">Inspirirano modelima poput Papa (SAD). Fokusira se na logističku pomoć (vožnja liječniku, WhatsApp/tech setup, sitni popravci, društvo) uz strogo izbjegavanje medicinske skrbi i hranjenja.</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                    <li><b>Ciljani kupac:</b> Odrasla djeca dijaspore i preopterećeni menadžeri (35-60 god) koji plaćaju za roditelje.</li>
+                                    <li><b>Jaz u ZG:</b> Privatni domovi su preskupi/puni, državni sustav trom, sivo tržište ne nudi transparentne izvještaje djeci.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Ekonomika & Tech</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li><i class="fa-solid fa-wallet w-4 text-gray-400"></i> <b>Cijena:</b> 149€ - 550€ mjesečne pretplate ili 25-40€/sat.</li>
+                                    <li><i class="fa-solid fa-money-bill-trend-up w-4 text-gray-400"></i> <b>Prihod (Solo):</b> 1.500€ - 5.000€ mjesečno.</li>
+                                    <li><i class="fa-solid fa-piggy-bank w-4 text-gray-400"></i> <b>Početni ulog:</b> 400€ - 1.500€.</li>
+                                    <li><i class="fa-solid fa-laptop-code w-4 text-gray-400"></i> <b>Uloga Dalija:</b> Izgradnja B2B portala gdje naručitelj (dijete) vidi GPS potvrde, fotografije i tjedne PDF izvještaje (Airtable + Softr). Automatizacija naplate karticama.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Idea 2 -->
+                <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer">
+                    <summary class="flex justify-between items-center font-bold p-5 md:p-6 text-gray-900 bg-white hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-secondary/10 text-secondary rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid fa-boxes-packing"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg md:text-xl">2. Organizacija Doma & Relokacijski Concierge</h3>
+                                <p class="text-sm text-gray-500 font-normal mt-0.5">Fizička transformacija ormara/kuhinja i raspakiravanje nakon selidbe.</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-5 md:p-6 border-t border-gray-100 bg-gray-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Koncept & Tržište</h4>
+                                <p class="text-sm text-gray-600 mb-3">Modeli poput The Home Edit. Ne radi se o klasičnom čišćenju, već o projektnoj usluzi postavljanja sustava (kuhinje, ostave, "baby arrival" priprema) i "move-in" uslugama za strance/povratnike.</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                    <li><b>Ciljani kupac:</b> Imućne obitelji, žene 35-55, novi stanari, digitalni nomadi.</li>
+                                    <li><b>Jaz u ZG:</b> Ljudi plaćaju edukacije o organizaciji, ali nedostaje "ključ u ruke" fizička izvedba.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Ekonomika & Tech</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li><i class="fa-solid fa-wallet w-4 text-gray-400"></i> <b>Cijena:</b> 300€ - 1.500€ po projektu (nikako naplata po satu).</li>
+                                    <li><i class="fa-solid fa-money-bill-trend-up w-4 text-gray-400"></i> <b>Prihod (Solo):</b> 1.500€ - 5.000€ mjesečno.</li>
+                                    <li><i class="fa-solid fa-piggy-bank w-4 text-gray-400"></i> <b>Početni ulog:</b> 350€ - 2.000€ (prijenosni printeri za etikete).</li>
+                                    <li><i class="fa-solid fa-laptop-code w-4 text-gray-400"></i> <b>Uloga Dalija:</b> Kvalifikacijski "Intake" obrazac s uploadom slika. Digitalni checklist za relokaciju, vizualni portfolio prije/poslije i CRM za praćenje projekata.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Idea 3 -->
+                <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer">
+                    <summary class="flex justify-between items-center font-bold p-5 md:p-6 text-gray-900 bg-white hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid fa-gift"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg md:text-xl">3. B2B Kustos za Korporativne Poklone</h3>
+                                <p class="text-sm text-gray-500 font-normal mt-0.5">Ekskluzivni "Onboarding" i "Wellness" paketi za IT tvrtke.</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-5 md:p-6 border-t border-gray-100 bg-gray-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Koncept & Tržište</h4>
+                                <p class="text-sm text-gray-600 mb-3">Inspirirano s Marigold & Grey. Zamjena jeftinih promo materijala (USB, olovke) kuriranim artisan hrvatskim proizvodima za nove zaposlenike ili blagdane.</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                    <li><b>Ciljani kupac:</b> HR menadžeri i Office manageri u IT tvrtkama (50-300 zaposlenih).</li>
+                                    <li><b>Jaz u ZG:</b> Nedostatak personalizirane, estetski besprijekorne logistike poklona.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Ekonomika & Tech</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li><i class="fa-solid fa-wallet w-4 text-gray-400"></i> <b>Cijena:</b> 50€ - 80€ po premium kutiji.</li>
+                                    <li><i class="fa-solid fa-money-bill-trend-up w-4 text-gray-400"></i> <b>Prihod (Solo):</b> 2.000€ - 8.000€ mjesečno (sezonski).</li>
+                                    <li><i class="fa-solid fa-piggy-bank w-4 text-gray-400"></i> <b>Početni ulog:</b> 900€ - 4.000€ (dizajn, premium kutije).</li>
+                                    <li><i class="fa-solid fa-laptop-code w-4 text-gray-400"></i> <b>Uloga Dalija:</b> Razvoj zaključanog digitalnog B2B kataloga. Sustav gdje HR mjesečno unosi imena novih zaposlenika, automatsko generiranje naljepnica za dostavu i zbirnih faktura.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Idea 4 -->
+                <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer">
+                    <summary class="flex justify-between items-center font-bold p-5 md:p-6 text-gray-900 bg-white hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid fa-spray-can-sparkles"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg md:text-xl">4. Čišćenje i Priprema Dječje Opreme</h3>
+                                <p class="text-sm text-gray-500 font-normal mt-0.5">Dubinsko pranje kolica i autosjedalica uz opciju prodaje.</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-5 md:p-6 border-t border-gray-100 bg-gray-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Koncept & Tržište</h4>
+                                <p class="text-sm text-gray-600 mb-3">Model poznat u UK ("pram cleaning"). Specijalizirano dubinsko pranje dječje opreme (para, ekstrakcija) uz pripremu, fotografiranje i listanje za preprodaju na portalima.</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                    <li><b>Ciljani kupac:</b> Roditelji koji prodaju opremu ili kupuju rabljeno, obitelji s drugim djetetom.</li>
+                                    <li><b>Jaz u ZG:</b> Opće čistionice to rade usputno. Fali brendiran "Pram Spa" s preuzimanjem na kućnom pragu.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Ekonomika & Tech</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li><i class="fa-solid fa-wallet w-4 text-gray-400"></i> <b>Cijena:</b> 45€ - 130€ ovisno o opremi + Resale dodatak.</li>
+                                    <li><i class="fa-solid fa-money-bill-trend-up w-4 text-gray-400"></i> <b>Prihod (Solo):</b> 2.000€ - 4.000€ mjesečno.</li>
+                                    <li><i class="fa-solid fa-piggy-bank w-4 text-gray-400"></i> <b>Početni ulog:</b> 1.500€ - 3.500€ (profesionalni strojevi za pranje).</li>
+                                    <li><i class="fa-solid fa-laptop-code w-4 text-gray-400"></i> <b>Uloga Dalija:</b> Kalkulator cijena prema vrsti kolica. Sustav online rezervacija za pickup/drop-off. Galerija dokaza prije/poslije za marketing.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Idea 5 -->
+                <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer">
+                    <summary class="flex justify-between items-center font-bold p-5 md:p-6 text-gray-900 bg-white hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid fa-house-user"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg md:text-xl">5. B2B Airbnb Zalihe & Home Staging Lite</h3>
+                                <p class="text-sm text-gray-500 font-normal mt-0.5">Upravljanje potrošnim materijalom i "lagana" priprema stana za prodaju/najam.</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-5 md:p-6 border-t border-gray-100 bg-gray-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Koncept & Tržište</h4>
+                                <p class="text-sm text-gray-600 mb-3">Dvije srodne niše: Opskrba apartmana za turizam (kava, papir) izravno u jedinicu, te vizualna priprema stanova za listanje uz minimalni budžet (bez teškog namještaja).</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                    <li><b>Ciljani kupac:</b> Upravitelji 5+ apartmana i agenti za nekretnine.</li>
+                                    <li><b>Jaz u ZG:</b> Agenti sami namještaju za slikanje. Vlasnici sami raznose WC papir po apartmanima.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Ekonomika & Tech</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li><i class="fa-solid fa-wallet w-4 text-gray-400"></i> <b>Cijena:</b> 70-90€ po apartmanu mjesečno. Staging 350-900€ projekt.</li>
+                                    <li><i class="fa-solid fa-money-bill-trend-up w-4 text-gray-400"></i> <b>Prihod (Solo):</b> 1.500€ - 4.000€ mjesečno.</li>
+                                    <li><i class="fa-solid fa-piggy-bank w-4 text-gray-400"></i> <b>Početni ulog:</b> 300€ - 2.500€.</li>
+                                    <li><i class="fa-solid fa-laptop-code w-4 text-gray-400"></i> <b>Uloga Dalija:</b> Integracija s Airbnb iCal-om za predviđanje potrošnje. Automatizirane pretplate i proaktivne WhatsApp poruke za nadoplatu paketa pred sezonu.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                 <!-- Idea 6 -->
+                <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer">
+                    <summary class="flex justify-between items-center font-bold p-5 md:p-6 text-gray-900 bg-white hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid fa-shirt"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg md:text-xl">6. Wardrobe Editing & "Vinted" Concierge</h3>
+                                <p class="text-sm text-gray-500 font-normal mt-0.5">Sređivanje ormara i usluga oglašavanja luksuzne odjeće (uz oprez).</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-5 md:p-6 border-t border-gray-100 bg-gray-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Koncept & Tržište</h4>
+                                <p class="text-sm text-gray-600 mb-3">Kombinacija stilista i declutteringa. Pomaže se ženama sortirati ormar, fotografirati robu i pripremiti je za prodaju. <b>PAŽNJA:</b> Ne raditi klasični consignment preko vlastitog računa zbog DAC7 direktive!</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                    <li><b>Ciljani kupac:</b> Žene s viškom kvalitetne odjeće i manjkom vremena.</li>
+                                    <li><b>Pivot strategija:</b> Klijent prodaje sa <i>svog</i> računa, ti naplaćuješ Setup/Listing fee umjesto uzimanja provizije kroz svoj IBAN.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Ekonomika & Tech</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li><i class="fa-solid fa-wallet w-4 text-gray-400"></i> <b>Cijena:</b> 120-160€ edit ormara + 10-15€ po listanom artiklu.</li>
+                                    <li><i class="fa-solid fa-money-bill-trend-up w-4 text-gray-400"></i> <b>Prihod (Solo):</b> 1.500€ - 3.500€ mjesečno.</li>
+                                    <li><i class="fa-solid fa-piggy-bank w-4 text-gray-400"></i> <b>Početni ulog:</b> 300€ - 1.000€ (ring light, stalak, pozadina).</li>
+                                    <li><i class="fa-solid fa-laptop-code w-4 text-gray-400"></i> <b>Uloga Dalija:</b> Izrada Intake obrasca, digitalni Lookbook za klijente, inventory tracker.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                 <!-- Idea 7 -->
+                 <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer">
+                    <summary class="flex justify-between items-center font-bold p-5 md:p-6 text-gray-900 bg-white hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid fa-paw"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg md:text-xl">7. Premium Briga o Ljubimcima (Wedding Chaperone)</h3>
+                                <p class="text-sm text-gray-500 font-normal mt-0.5">Stručna pratnja pasa na vjenčanjima i ekskluzivno kućno čuvanje.</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-5 md:p-6 border-t border-gray-100 bg-gray-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Koncept & Tržište</h4>
+                                <p class="text-sm text-gray-600 mb-3">Ultra-premium mikrousluga za imućne vlasnike pasa. Vjenčani pratitelj brine o psu tijekom obreda i slikanja. Alternativa su noćna čuvanja mačaka/pasa u klijentovom domu.</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                    <li><b>Ciljani kupac:</b> Budući mladenci s visokim budžetom, česti poslovni putnici.</li>
+                                    <li><b>B2B Pristup:</b> Sklapanje partnerstva s luksuznim organizatorima vjenčanja koji uslugu ugrađuju u pakete.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Ekonomika & Tech</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li><i class="fa-solid fa-wallet w-4 text-gray-400"></i> <b>Cijena:</b> 250-450€ po vjenčanju. 60-90€ po noći čuvanja.</li>
+                                    <li><i class="fa-solid fa-money-bill-trend-up w-4 text-gray-400"></i> <b>Prihod (Solo):</b> 1.500€ - 4.000€ mjesečno.</li>
+                                    <li><i class="fa-solid fa-piggy-bank w-4 text-gray-400"></i> <b>Početni ulog:</b> 250€ - 2.000€ (oprema za vozilo, osiguranje odgovornosti).</li>
+                                    <li><i class="fa-solid fa-laptop-code w-4 text-gray-400"></i> <b>Uloga Dalija:</b> Sustav "Paws-itive Update": slanje dizaniranih automatiziranih fotografija mladencima na WhatsApp tijekom svadbe. Baza podataka navika psa.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Idea 8 (Dodano iz Izvješća 3) -->
+                <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer">
+                    <summary class="flex justify-between items-center font-bold p-5 md:p-6 text-gray-900 bg-white hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid fa-plane-arrival"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg md:text-xl">8. Zagreb Arrival / Move-in Concierge</h3>
+                                <p class="text-sm text-gray-500 font-normal mt-0.5">Praktična usluga dolaska za strance, expate i povratnike (bez pravnog savjetovanja).</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-5 md:p-6 border-t border-gray-100 bg-gray-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Koncept & Tržište</h4>
+                                <p class="text-sm text-gray-600 mb-3">Za razliku od skupih korporativnih agencija za preseljenje, ovo je brza, potrošačka verzija za digitalne nomade, studente i mlade obitelji. Pomoć oko Wi-Fi-ja, preporuke kvartova, checkliste, nabava za prvi dan i koordinacija čišćenja stana prije useljenja.</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                    <li><b>Ciljani kupac:</b> Stranci, povratnici iz EU/UK, freelanceri i međunarodni studenti.</li>
+                                    <li><b>Ograničenja:</b> Isključivo logistička pomoć. Strogo izbjegavati nuđenje imigracijskih, pravnih ili poreznih usluga.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Ekonomika & Tech</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li><i class="fa-solid fa-wallet w-4 text-gray-400"></i> <b>Cijena:</b> 49-79€ (Starter Call) do 299-499€ (Move-in Setup).</li>
+                                    <li><i class="fa-solid fa-money-bill-trend-up w-4 text-gray-400"></i> <b>Prihod (Solo):</b> 2.000€ - 6.000€ mjesečno.</li>
+                                    <li><i class="fa-solid fa-piggy-bank w-4 text-gray-400"></i> <b>Početni ulog:</b> 500€ - 1.500€ (uglavnom brending i platforma).</li>
+                                    <li><i class="fa-solid fa-laptop-code w-4 text-gray-400"></i> <b>Uloga Dalija:</b> Segmentirane Landing stranice na engleskom, kalkulator prvog mjeseca u ZG, digitalni Baza partnera i automatizirani check-list mailovi.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Idea 9 (Dodano iz Izvješća 2) -->
+                <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer">
+                    <summary class="flex justify-between items-center font-bold p-5 md:p-6 text-gray-900 bg-white hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-lime-100 text-lime-700 rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid fa-couch"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg md:text-xl">9. Home Staging Lite (Vizualna Priprema Nekretnina)</h3>
+                                <p class="text-sm text-gray-500 font-normal mt-0.5">Priprema stanova za prodaju/najam bez skupog najma namještaja.</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-5 md:p-6 border-t border-gray-100 bg-gray-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Koncept & Tržište</h4>
+                                <p class="text-sm text-gray-600 mb-3">Ovo nije puni dizajn interijera. Riječ je o brzoj intervenciji ("photo-ready u 48h"): micanje osobnih stvari (decluttering), preslagivanje postojećeg namještaja, dodavanje sitnog dekora i koordinacija profesionalnog fotografa. Prodaje se brži ishod prodaje, a ne dizajn.</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                    <li><b>Ciljani kupac:</b> Manji agenti za nekretnine, mali investitori, privatni prodavatelji.</li>
+                                    <li><b>Tržišni Jaz:</b> Agenti nemaju vremena ni vještina za stiliziranje, a dizajneri su preskupi za prosječne stanove.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Ekonomika & Tech</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li><i class="fa-solid fa-wallet w-4 text-gray-400"></i> <b>Cijena:</b> 150€ audit, 350-700€ lite staging po nekretnini.</li>
+                                    <li><i class="fa-solid fa-money-bill-trend-up w-4 text-gray-400"></i> <b>Prihod (Solo):</b> 1.500€ - 4.000€ mjesečno.</li>
+                                    <li><i class="fa-solid fa-piggy-bank w-4 text-gray-400"></i> <b>Početni ulog:</b> 900€ - 2.500€ (manji set dekoracija, jastuka i rasvjete).</li>
+                                    <li><i class="fa-solid fa-laptop-code w-4 text-gray-400"></i> <b>Uloga Dalija:</b> Lead forma s uploadom slika stana, kalkulator ROI-ja za vlasnike, bogata biblioteka "Prije/Poslije" projekata.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Idea 10 (Debata izvješća) -->
+                <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer border-l-4 border-l-red-400">
+                    <summary class="flex justify-between items-center font-bold p-5 md:p-6 text-gray-900 bg-white hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-red-50 text-red-500 rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid fa-baby-carriage"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg md:text-xl">10. Najam Dječje Opreme <span class="bg-red-100 text-red-800 text-[10px] uppercase px-2 py-1 rounded ml-2 font-bold tracking-wider">Podijeljena Mišljenja</span></h3>
+                                <p class="text-sm text-gray-500 font-normal mt-0.5">Najam kolica, krevetića i autosjedalica turistima (Rizik vs. Nagrada).</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-5 md:p-6 border-t border-gray-100 bg-gray-50/50">
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-4 text-sm text-yellow-800">
+                            <b>Napomena Istraživača:</b> Izvješće 1 sugerira izbjegavanje ove niše (niska satnica od 10€, rizik od tužbi, zasitnost), dok Izvješća 2 i 3 (BabyQuip model) vide ovu priliku kao vrlo isplativu ako se fokusira na uske premium "bundle" pakete i B2B hotele.
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Koncept & Tržište</h4>
+                                <p class="text-sm text-gray-600 mb-3">Model rješava logističku bol putovanja s glomaznom opremom. Usluga dostavlja čiste, certificirane komade opreme izravno u Airbnb ili hotel na dan dolaska gosta.</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                    <li><b>Ciljani kupac:</b> Turisti, gosti na vjenčanjima, bake i djedovi kojima dolaze unuci.</li>
+                                    <li><b>Kritični faktor:</b> Higijena i rigorozno praćenje sigurnosnih standarda opreme.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Ekonomika & Tech</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li><i class="fa-solid fa-wallet w-4 text-gray-400"></i> <b>Cijena:</b> 8-15€ po danu/artiklu. Vikend paketi 45-120€.</li>
+                                    <li><i class="fa-solid fa-money-bill-trend-up w-4 text-gray-400"></i> <b>Prihod (Solo):</b> 1.200€ - 5.000€ mjesečno (ovisno o sezoni).</li>
+                                    <li><i class="fa-solid fa-piggy-bank w-4 text-gray-400"></i> <b>Početni ulog:</b> 2.500€ - 8.000€ (Visoko kapitalno opterećenje).</li>
+                                    <li><i class="fa-solid fa-laptop-code w-4 text-gray-400"></i> <b>Uloga Dalija:</b> Kompleksan booking kalendar za praćenje zaliha, digitalno potpisivanje izjava o odricanju od odgovornosti (e-waiver), naplata sigurnosnih depozita.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Idea 11 (Dodano iz Izvješća 1 i 2) -->
+                <details class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer">
+                    <summary class="flex justify-between items-center font-bold p-5 md:p-6 text-gray-900 bg-white hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid fa-file-signature"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg md:text-xl">11. Asistent za Birokraciju i Downsizing (Clear-out)</h3>
+                                <p class="text-sm text-gray-500 font-normal mt-0.5">Pomoć strancima u sustavu te rasčišćavanje nekretnina obitelji.</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-5 md:p-6 border-t border-gray-100 bg-gray-50/50">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Koncept & Tržište</h4>
+                                <p class="text-sm text-gray-600 mb-3">Dvije specifične grane: 1) TaskRabbit model navigacije kroz komplicirane javne ustanove za strance i male poduzetnike; 2) Emocionalno zahtjevna logistika pražnjenja domova ("estate clear-out") nakon selidbe seniora ili smrti.</p>
+                                <ul class="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                    <li><b>Ciljani kupac:</b> Stranci u RH, nasljednici nekretnina, odrasla djeca.</li>
+                                    <li><b>Prednost:</b> Gotovo da nema jasne ponude za organizirani "estate downsizing".</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2">Ekonomika & Tech</h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li><i class="fa-solid fa-wallet w-4 text-gray-400"></i> <b>Cijena:</b> 250-900€ po Downsizing projektu. 800-1200€ mjesečno asistent.</li>
+                                    <li><i class="fa-solid fa-money-bill-trend-up w-4 text-gray-400"></i> <b>Prihod (Solo):</b> 800€ - 3.500€ mjesečno.</li>
+                                    <li><i class="fa-solid fa-piggy-bank w-4 text-gray-400"></i> <b>Početni ulog:</b> 100€ - 1.500€.</li>
+                                    <li><i class="fa-solid fa-laptop-code w-4 text-gray-400"></i> <b>Uloga Dalija:</b> Inventurni tracker namještaja, donacijski/resale workflow, CRM za komunikaciju s razasutim članovima obitelji.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+            </div>
+        </section>
+
+        <!-- =================== TAB 3: OSTALE IDEJE =================== -->
+        <section id="other-ideas" class="tab-content max-w-4xl mx-auto">
+            <div class="mb-8">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-dark mb-4 tracking-tight">Ostale Razmotrene Niše</h2>
+                <p class="text-gray-600 text-lg">Konsolidirani popis svih mikro-niša spomenutih u analizama. Ove ideje imaju potencijal u specifičnim uvjetima, ali u prosjeku nose višu razinu rizika, manju maržu ili su prespecifične za brzi rast solo obrta.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                
+                <!-- Expanded Micro-Niches from all 3 documents -->
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-gray-800 mb-2 text-md"><i class="fa-solid fa-box-open text-blue-500 mr-1"></i> Edukativne (KiwiCo) Kutije</h4>
+                    <p class="text-sm text-gray-600">Pretplatničke STEAM kutije za predškolce. Visoka cijena izrade prototipa i sigurnost dječjih igračaka čine ovaj model kapitalno zahtjevnim za početak.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-gray-800 mb-2 text-md"><i class="fa-solid fa-baby text-pink-500 mr-1"></i> Postporođajna Logistika</h4>
+                    <p class="text-sm text-gray-600">Ne-medicinska "doula" podrška majkama. Oslanjanje na bake u RH je još snažno, a zarada oscilira. Povezan rizik ako se radi s hranom za rodilje.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-gray-800 mb-2 text-md"><i class="fa-solid fa-cookie-bite text-amber-500 mr-1"></i> Uredski Snack & Hrana</h4>
+                    <p class="text-sm text-gray-600">Dostava "zdravih košara" malim uredima (B2B). Jako dobro poslovanje na pretplatu, ali iziskuje sanitarne uvjete i deklaracije o hrani/alergenima.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-gray-800 mb-2 text-md"><i class="fa-solid fa-puzzle-piece text-purple-500 mr-1"></i> Soft-play Party Kutije</h4>
+                    <p class="text-sm text-gray-600">Najam malih kućnih igraonica ("Party in a Box"). Rješava izbjegavanje rođendaonica, no zahtijeva puno prostora za skladištenje i stalno dubinsko čišćenje opreme.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-gray-800 mb-2 text-md"><i class="fa-solid fa-leaf text-green-500 mr-1"></i> Houseplant Care / Balkoni</h4>
+                    <p class="text-sm text-gray-600">Usluga brige o biljkama i vizualno uređenje urbanih balkona. Smatra se preskupim za opću populaciju; najbolje integrirati kao "upsell" u Organizaciju Doma.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-gray-800 mb-2 text-md"><i class="fa-solid fa-spa text-rose-500 mr-1"></i> K-Beauty Konzultacije</h4>
+                    <p class="text-sm text-gray-600">Slaganje "skincare" rutina i košarica preko postojećih EU trgovaca (Ksisters). Niska marža za vrijeme utrošeno na konzultacije, tržište brzo zasićeno influenserima.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-gray-800 mb-2 text-md"><i class="fa-solid fa-shield-halved text-indigo-500 mr-1"></i> English Confidence & Safety</h4>
+                    <p class="text-sm text-gray-600">Radionice digitalne sigurnosti za starije i konverzacijski klubovi za djecu. Nizak rizik, ali zahtijeva grupe za profitabilnost i stalnu logistiku prostora.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-gray-800 mb-2 text-md"><i class="fa-solid fa-tags text-teal-500 mr-1"></i> Pre-loved Baby Gear</h4>
+                    <p class="text-sm text-gray-600">Posredovanje u prodaji dječje opreme (Consignment). Slično kao odjeća, ali puno više prostora zauzimaju kolica i krevetići na čekanju prodaje.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-gray-800 mb-2 text-md"><i class="fa-solid fa-globe text-cyan-500 mr-1"></i> JP/KR Lifestyle E-commerce</h4>
+                    <p class="text-sm text-gray-600">Nišni uvoz dekoracija/pribora. Ovisnost o carini, visok inventar, dugi rokovi dostave i mala marža iziskuju iznimno velika kapitalna ulaganja (3.000-10.000€).</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-gray-800 mb-2 text-md"><i class="fa-solid fa-yin-yang text-orange-500 mr-1"></i> Ženske Self-care Radionice</h4>
+                    <p class="text-sm text-gray-600">Organizacija lokalnih retreat događaja. Teško postići povratak (repeat business) korisnica bez prisustva vrlo snažnog osobnog brenda.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-gray-800 mb-2 text-md"><i class="fa-solid fa-bone text-yellow-600 mr-1"></i> Pet Birthday / Sub Boxes</h4>
+                    <p class="text-sm text-gray-600">Rođendanske i mjesečne kutije za ljubimce (BarkBox model). Iako je novitet zabavan, vlasnici brzo odustaju od pretplate (mala ponovljivost).</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-gray-800 mb-2 text-md"><i class="fa-solid fa-broom text-gray-500 mr-1"></i> Marketplace Čišćenja</h4>
+                    <p class="text-sm text-gray-600">Koordinacija tuđih čistačica za stanove. Marže su ekstremno tanke, problem kvalitete radne snage prevelik, operativno iscrpljujuće za solo start.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =================== TAB 4: ŠTO IZBJEGAVATI =================== -->
+        <section id="avoid" class="tab-content max-w-4xl mx-auto">
+            <div class="mb-8">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-danger mb-4 tracking-tight">Što Strogo Izbjegavati</h2>
+                <p class="text-gray-600 text-lg">Sva tri izvješća izrazito upozoravaju na određene poslovne modele koji se čine primamljivima na društvenim mrežama, ali u EU/RH zakonodavstvu predstavljaju operativnu noćnu moru.</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Red Card 1 -->
+                <div class="bg-red-50 border-l-4 border-danger p-6 rounded-r-xl shadow-sm">
+                    <h3 class="text-xl font-bold text-red-900 flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-ban"></i> Uvoz i preprodaja kozmetike (K-Beauty)
+                    </h3>
+                    <p class="text-red-800 mb-3 text-sm">Nipošto ne uvoziti "niche" kozmetiku iz Azije i prodavati je na vlastitom webshopu ili kroz pretplatničke kutije.</p>
+                    <div class="bg-white/60 p-3 rounded text-sm text-red-900 font-medium">
+                        <b>Razlog:</b> Europska unija zahtijeva ulogu "Odgovorne osobe" (Responsible Person). Svaki uvoznik mora osigurati procjenitelja sigurnosti (Safety Assessor), voditi PIF dosje, notificirati proizvod u CPNP portalu i preuzima potpunu pravnu i financijsku odgovornost u slučaju alergijskih reakcija kupaca. Neisplativo bez 10.000+ EUR kapitala.
+                    </div>
+                </div>
+
+                <!-- Red Card 2 -->
+                <div class="bg-red-50 border-l-4 border-danger p-6 rounded-r-xl shadow-sm">
+                    <h3 class="text-xl font-bold text-red-900 flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-ban"></i> Masovna preprodaja tuđe odjeće (Agencijski model)
+                    </h3>
+                    <p class="text-red-800 mb-3 text-sm">Ne otvarati agenciju koja prodaje tuđu rabljenu robu (Consignment) prebacujući novac preko vlastitog privatnog/obrtničkog računa na Vintedu ili eBayu.</p>
+                    <div class="bg-white/60 p-3 rounded text-sm text-red-900 font-medium">
+                        <b>Razlog:</b> Nova EU Direktiva DAC7. Platforme sada automatski prijavljuju poreznoj upravi korisnike koji prijeđu limit od 30 prodanih artikala ili 2.000 eura. Sav prihod bio bi knjižen vama, uništavajući financije paušalnog obrta i potencijalno vas gurajući u sustav PDV-a. Rješenje: Naplaćivati fiksni "Listing fee" uslužno, s klijentovog profila.
+                    </div>
+                </div>
+
+                <!-- Red Card 3 -->
+                <div class="bg-red-50 border-l-4 border-danger p-6 rounded-r-xl shadow-sm">
+                    <h3 class="text-xl font-bold text-red-900 flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-ban"></i> Dodaci prehrani i Wellness s medicinskim tvrdnjama
+                    </h3>
+                    <p class="text-red-800 mb-3 text-sm">Izbjegavati postporođajne "ingestibles" (ono što se jede/pije) i wellness kutije sa suplementima.</p>
+                    <div class="bg-white/60 p-3 rounded text-sm text-red-900 font-medium">
+                        <b>Razlog:</b> Ekstremno visok rizik zdravstvenih tvrdnji, deklaracija o hrani i alergenima. U EU je to najstrože regulirano područje nakon farmacije.
+                    </div>
+                </div>
+
+                <!-- Red Card 4 -->
+                <div class="bg-gray-100 border border-gray-300 p-6 rounded-xl shadow-sm">
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Ostali modeli visokog rizika za start:</h3>
+                        <li><b>Izgradnja vlastite aplikacije / Marketplacea:</b> Previše kapitala za start. Služite se gotovim no-code alatima (Softr, Airtable) za validaciju. Rješavanje "kokoš-jaje" problema traži golem budžet.</li>
+                        <li><b>Generičke Social Media Agencije:</b> Tržište u ZG je prepuno studenata i freelancera; destruktivan cjenovni rat bez profitabilnosti.</li>
+                        <li><b>Ugostiteljstvo / Saloni:</b> Kapitalno intenzivno, visoki troškovi zakupa, ovisnost o radnoj snazi.</li>
+                        <li><b>Uvoz igračaka izvan EU (Kina):</b> Zahtijeva dokazivanje CE sukladnosti i rigorozne sigurnosne testove. Igračke (npr. s AliExpressa) ne uvoziti za dječje rođendane i preprodaju.</li>
+                        <li><b>Beauty Box Pretplata (Subscription):</b> Izgleda lukrativno, no zahtijeva golemu logistiku, pregovaranje besplatnih uzoraka direktno s brendovima i povlači rizik povrata robe te pritužbi nezadovoljnih pretplatnika.</li>
+                        <li><b>Dropshipping s generičkim proizvodima:</b> Model koji više ne funkcionira bez ogromnih budžeta za oglašavanje. Kvaliteta proizvoda je upitna, a Europska direktiva za zaštitu potrošača štiti kupce kod povrata (što pada na vaš trošak).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <script>
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+
+            // Reset desktop buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white', 'shadow-lg', 'shadow-primary/40', 'hover:-translate-y-0.5');
+                btn.classList.add('text-gray-600', 'hover:bg-purple-50', 'hover:text-primary', 'hover:shadow-sm');
+            });
+            
+            // Set active desktop button
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-primary', 'text-white', 'shadow-lg', 'shadow-primary/40', 'hover:-translate-y-0.5');
+                activeBtn.classList.remove('text-gray-600', 'hover:bg-purple-50', 'hover:text-primary', 'hover:shadow-sm');
+            }
+
+            // Reset mobile buttons
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                btn.classList.remove('text-primary');
+                btn.classList.add('text-gray-400');
+            });
+
+            // Set active mobile button
+            const activeMobileBtn = document.getElementById('mbtn-' + tabId);
+            if(activeMobileBtn) {
+                activeMobileBtn.classList.add('text-primary');
+                activeMobileBtn.classList.remove('text-gray-400');
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Accordion singular open logic (Optional: close others when one opens)
+        const details = document.querySelectorAll("details");
+        details.forEach((targetDetail) => {
+            targetDetail.addEventListener("click", () => {
+                // Close all other details
+                details.forEach((detail) => {
+                    if (detail !== targetDetail) {
+                        detail.removeAttribute("open");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
